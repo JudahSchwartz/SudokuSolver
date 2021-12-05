@@ -55,20 +55,21 @@ class SudokuBoard:
                 if should_be_considered(state):
                     mark_considered(state)
                     solutions.extend(state.get_solutions())
+            return solutions
 
     def is_full_board(self):
         for list_ in self.backingBoard:
             for num in list_:
-                if num is 0:
+                if num == 0:
                     return False
         return True
 
     def is_valid_board(self):
-        return not self.has_duplicate_in_columns() and not self.has_duplicate_in_rows() and not self.has_duplicate_in_box()
+        return not self.has_duplicate_in_rows() and not self.has_duplicate_in_cols() and not self.has_duplicate_in_box()
 
-    def get_next_possible_states(self) -> list[SudokuBoard]:
+    def get_next_possible_states(self) -> list:
         states = []
-        for xy in [(x, y) for x in range(10) for y in range(10)]:
+        for xy in [(x, y) for x in range(9) for y in range(9)]:
             if self.backingBoard[xy[0]][xy[1]] == 0:
                 for newVal in range(1, 10):
                     board = copy.deepcopy(self)
@@ -77,8 +78,22 @@ class SudokuBoard:
                         states.append(board)
         return states
 
-    def has_duplicate_in_columns(self):
+    def has_duplicate_in_rows(self):
         return any([has_duplicates(x) for x in self.backingBoard])
 
-    def has_duplicate_in_rows(self):
-        pass
+    def has_duplicate_in_cols(self):
+        any([has_duplicates(map(lambda a: a[i], self.backingBoard)) for i in range(9)])
+
+    def has_duplicate_in_box(self):
+        return any(has_duplicates(x) for x in self.get_boxes_numbers_lists())
+
+    def get_boxes_numbers_lists(self):
+        lists = []
+        for i in range(0, 7, 3):
+            for j in range(0, 7, 3):
+                new_list = []
+                for x in range(2):
+                    for y in range(2):
+                        new_list.append(self.backingBoard[i + x][j + y])
+                lists.append(new_list)
+        return lists

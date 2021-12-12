@@ -44,7 +44,10 @@ class SudokuBoard:
 
     def get_solutions(self):
         if self.is_full_board():
+            print("thinking")
             if self.is_valid_board():
+                print("Solution found")
+                print(self)
                 return {self}
             else:
                 return set()
@@ -56,6 +59,17 @@ class SudokuBoard:
                     mark_considered(state)
                     solutions |= state.get_solutions()
             return solutions
+
+    def __str__(self) -> str:
+        string = ""
+        for row in self.backing_board:
+            for i in range(9):
+                string += " " if row[i] == 0 else str(row[i])
+                if (i + 1) % 3 == 0:
+                    string += "|"
+            string += "\n"
+        return string
+
 
     def __eq__(self, o: object) -> bool:
         return isinstance(o, SudokuBoard) and self.backing_board.__eq__(o.backing_board)
@@ -91,7 +105,7 @@ class SudokuBoard:
         return any([has_duplicates(x) for x in self.backing_board])
 
     def has_duplicate_in_cols(self):
-        any([has_duplicates(map(lambda a: a[i], self.backing_board)) for i in range(9)])
+        return any([has_duplicates(map(lambda a: a[i], self.backing_board)) for i in range(9)])
 
     def has_duplicate_in_box(self):
         return any(has_duplicates(x) for x in self.get_boxes_numbers_lists())
